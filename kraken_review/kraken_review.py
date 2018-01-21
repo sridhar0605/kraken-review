@@ -19,7 +19,7 @@ class KrakenSummary(object):
 
         nodes = {}
         current_root_index = 0
-        re_prefix = re.compile('^\s*')
+        re_indent = re.compile('^\s*')
 
         tree = ete3.Tree()
         root = tree.add_child(name='root')
@@ -30,8 +30,8 @@ class KrakenSummary(object):
             for line in csv.reader(handle, delimiter='\t'):
                 fraction, cumulative, count, order, tax_id, taxa_entry = line
 
-                indent_size = len(re_prefix.match(taxa_entry).group())
-                taxa_name = re_prefix.sub('', taxa_entry)
+                indent_size = len(re_indent.match(taxa_entry).group())
+                taxa_name = re_indent.sub('', taxa_entry)
 
                 if taxa_name == 'root':
                     continue
