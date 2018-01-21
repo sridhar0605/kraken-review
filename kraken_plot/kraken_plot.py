@@ -32,10 +32,10 @@ class KrakenSummary(object):
                 num_whitespace = len(re_prefix.match(taxa_entry).group()) / 2
                 taxa_name = re_prefix.sub('', taxa_entry)
 
-                if taxa_entry == 'root':
+                if taxa_name == 'root':
                     continue
 
-                if not ignore_unclassified and taxa_entry == 'unclassified':
+                if not ignore_unclassified and taxa_name == 'unclassified':
                     tree.add_child(name='unclassified')
 
                 if num_whitespace >= current_root_index:
