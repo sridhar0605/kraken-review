@@ -9,17 +9,19 @@ import toytree
 __all__ = [
     'KrakenSummary']
 
+INDENT_UNIT = 2
+
 
 class KrakenSummary(object):
     def __init__(self, infile, ignore_unclassified=False):
         self.infile = Path(infile).expanduser().resolve()
+        self.ignore_unclassified = ignore_unclassified
 
         nodes = {}
         current_root_index = 0
-        re_prefix = re.compile('^\s*')
+        re_indent = re.compile('^\s*')
 
         tree = ete3.Tree()
-
         root = tree.add_child(name='root')
 
         nodes[current_root_index] = root
@@ -28,22 +30,22 @@ class KrakenSummary(object):
             for line in csv.reader(handle, delimiter='\t'):
                 fraction, cumulative, count, order, tax_id, taxa_entry = line
 
-                num_whitespace = len(re_prefix.match(taxa_entry).group()) / 2
-                taxa_name = re_prefix.sub('', taxa_entry)
+                indent_size = len(re_indent.match(taxa_entry).group())
+                taxa_name = re_indent.sub('', taxa_entry)
 
-                if taxa_entry == 'root':
+                if taxa_name == 'root':
                     continue
 
-                if not ignore_unclassified and taxa_entry == 'unclassified':
+                if not ignore_unclassified and taxa_name == 'unclassified':
                     tree.add_child(name='unclassified')
 
-                if num_whitespace >= current_root_index:
+                if indent_size >= current_root_index:
                     parent = nodes[current_root_index]
                 else:
-                    parent = nodes[num_whitespace - 1]
+                    parent = nodes[indent_size - INDENT_UNIT]
 
                 child = parent.add_child(name=taxa_name)
-                current_root_index = num_whitespace
+                current_root_index = indent_size
                 nodes[current_root_index] = child
 
         self.tree = tree
@@ -57,4 +59,7 @@ class KrakenSummary(object):
         return toytree.tree(self.newick)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}("{self.infile}")'
+        return (
+            f'{self.__class__.__name__}('
+            f'"{self.infile}", '
+            f'ignore_unclassified={self.ignore_unclassified})')
