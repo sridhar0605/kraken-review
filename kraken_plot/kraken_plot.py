@@ -13,6 +13,7 @@ __all__ = [
 class KrakenSummary(object):
     def __init__(self, infile, ignore_unclassified=False):
         self.infile = Path(infile).expanduser().resolve()
+        self.ignore_unclassified = ignore_unclassified
 
         nodes = {}
         current_root_index = 0
@@ -57,4 +58,7 @@ class KrakenSummary(object):
         return toytree.tree(self.newick)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}("{self.infile}")'
+        return (
+            f'{self.__class__.__name__}('
+            f'"{self.infile}", '
+            f'ignore_unclassified={self.ignore_unclassified})')
